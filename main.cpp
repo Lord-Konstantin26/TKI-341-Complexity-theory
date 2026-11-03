@@ -1,4 +1,4 @@
-#include <windows.h>
+п»ї#include <windows.h>
 #include <cstdint>
 #include <iostream>
 #include <random>
@@ -9,11 +9,10 @@ using namespace std;
 const int N = 10000;
 
 struct Statistics {
-    uint64_t comparisons = 0; // Сравнения элементов
-    uint64_t writes = 0;      // Записи в массив
+    uint64_t comparisons = 0;
+    uint64_t writes = 0;
 };
 
-// Пузырьковая сортировка
 void bubbleSort(vector<int>& a, Statistics& stats) {
     int n = static_cast<int>(a.size());
 
@@ -33,15 +32,12 @@ void bubbleSort(vector<int>& a, Statistics& stats) {
             }
         }
 
-        // Если за проход перестановок не было,
-        // массив уже отсортирован
         if (!changed) {
             break;
         }
     }
 }
 
-// Сортировка вставками
 void insertionSort(vector<int>& a, Statistics& stats) {
     int n = static_cast<int>(a.size());
 
@@ -67,7 +63,6 @@ void insertionSort(vector<int>& a, Statistics& stats) {
     }
 }
 
-// Разбиение массива по алгоритму Хоара
 int hoarePartition(vector<int>& a, int left, int right, Statistics& stats) {
     int pivot = a[left + (right - left) / 2];
     int i = left - 1;
@@ -96,7 +91,6 @@ int hoarePartition(vector<int>& a, int left, int right, Statistics& stats) {
     }
 }
 
-// Быстрая сортировка Хоара
 void quickSort(vector<int>& a, int left, int right, Statistics& stats) {
     if (left >= right) {
         return;
@@ -108,34 +102,27 @@ void quickSort(vector<int>& a, int left, int right, Statistics& stats) {
     quickSort(a, split + 1, right, stats);
 }
 
-// Вывод статистики
 void printStatistics(const char* name, const Statistics& stats) {
     cout << name << ":\n";
-    cout << "  Сравнений элементов: " << stats.comparisons << '\n';
-    cout << "  Записей в массив: " << stats.writes << '\n';
-    cout << "  Всего операций: "
+    cout << "  РЎСЂР°РІРЅРµРЅРёР№ СЌР»РµРјРµРЅС‚РѕРІ: " << stats.comparisons << '\n';
+    cout << "  Р—Р°РїРёСЃРµР№ РІ РјР°СЃСЃРёРІ: " << stats.writes << '\n';
+    cout << "  Р’СЃРµРіРѕ РѕРїРµСЂР°С†РёР№: "
         << stats.comparisons + stats.writes << "\n\n";
 }
 
 int main() {
-    // Настройка консоли Windows для вывода текста в UTF-8
     SetConsoleOutputCP(CP_UTF8);
     SetConsoleCP(CP_UTF8);
 
     vector<int> original(N);
 
-    // Генератор псевдослучайных чисел.
-    // Число 42 позволяет получать одинаковый массив при каждом запуске.
     mt19937 generator(42);
     uniform_int_distribution<int> distribution(-100, 100);
 
-    // Заполняем массив числами от -100 до 100
     for (int& number : original) {
         number = distribution(generator);
     }
 
-    // Создаём три копии исходного массива,
-    // чтобы каждый алгоритм сортировал одинаковые числа
     vector<int> bubbleArray = original;
     vector<int> insertionArray = original;
     vector<int> quickArray = original;
@@ -144,18 +131,16 @@ int main() {
     Statistics insertionStats;
     Statistics quickStats;
 
-    // Сортируем массивы
     bubbleSort(bubbleArray, bubbleStats);
     insertionSort(insertionArray, insertionStats);
     quickSort(quickArray, 0, N - 1, quickStats);
 
-    // Показываем результаты
-    cout << "Размер массива: " << N << " элементов\n";
-    cout << "Диапазон чисел: от -100 до 100\n\n";
+    cout << "Р Р°Р·РјРµСЂ РјР°СЃСЃРёРІР°: " << N << " СЌР»РµРјРµРЅС‚РѕРІ\n";
+    cout << "Р”РёР°РїР°Р·РѕРЅ С‡РёСЃРµР»: РѕС‚ -100 РґРѕ 100\n\n";
 
-    printStatistics("Пузырьковая сортировка", bubbleStats);
-    printStatistics("Сортировка вставками", insertionStats);
-    printStatistics("Быстрая сортировка Хоара", quickStats);
+    printStatistics("РџСѓР·С‹СЂСЊРєРѕРІР°СЏ СЃРѕСЂС‚РёСЂРѕРІРєР°", bubbleStats);
+    printStatistics("РЎРѕСЂС‚РёСЂРѕРІРєР° РІСЃС‚Р°РІРєР°РјРё", insertionStats);
+    printStatistics("Р‘С‹СЃС‚СЂР°СЏ СЃРѕСЂС‚РёСЂРѕРІРєР° РҐРѕР°СЂР°", quickStats);
 
     return 0;
 }
