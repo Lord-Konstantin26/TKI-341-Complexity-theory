@@ -1,4 +1,4 @@
-﻿#include <windows.h>
+#include <windows.h>
 #include <cstdint>
 #include <iostream>
 #include <random>
@@ -26,7 +26,6 @@ void bubbleSort(vector<int>& a, Statistics& stats) {
                 int temp = a[j];
                 a[j] = a[j + 1];
                 a[j + 1] = temp;
-
                 stats.writes += 2;
                 changed = true;
             }
@@ -43,63 +42,85 @@ void insertionSort(vector<int>& a, Statistics& stats) {
 
     for (int i = 1; i < n; i++) {
         int value = a[i];
-        int j = i - 1;
+        int left = 0;
+        int right = i;
 
-        while (j >= 0) {
+        while (left < right) {
+            int middle = left + (right - left) / 2;
             stats.comparisons++;
 
-            if (a[j] > value) {
-                a[j + 1] = a[j];
-                stats.writes++;
-                j--;
-            }
-            else {
-                break;
+            if (a[middle] <= value) {
+                left = middle + 1;
+            } else {
+                right = middle;
             }
         }
 
-        a[j + 1] = value;
+        for (int j = i; j > left; j--) {
+            a[j] = a[j - 1];
+            stats.writes++;
+        }
+
+        a[left] = value;
         stats.writes++;
     }
 }
 
-int hoarePartition(vector<int>& a, int left, int right, Statistics& stats) {
-    int pivot = a[left + (right - left) / 2];
-    int i = left - 1;
-    int j = right + 1;
-
-    while (true) {
-        do {
-            i++;
-            stats.comparisons++;
-        } while (a[i] < pivot);
-
-        do {
-            j--;
-            stats.comparisons++;
-        } while (a[j] > pivot);
-
-        if (i >= j) {
-            return j;
-        }
-
-        int temp = a[i];
-        a[i] = a[j];
-        a[j] = temp;
-
-        stats.writes += 2;
-    }
-}
-
-void quickSort(vector<int>& a, int left, int right, Statistics& stats) {
-    if (left >= right) {
+void mergeSort(vector<int>& a, Statistics& stats) {
+    if (a.size() <= 1) {
         return;
     }
 
-    int split = hoarePartition(a, left, right, stats);
+    int middle = static_cast<int>(a.size()) / 2;
+    vector<int> left;
+    vector<int> right;
 
-    quickSort(a, left, split, stats);
-    quickSort(a, split + 1, right, stats);
+    for (int i = 0; i < middle; i++) {
+        left.push_back(a[i]);
+        stats.writes++;
+    }
+
+    for (int i = middle; i < static_cast<int>(a.size()); i++) {
+        right.push_back(a[i]);
+        stats.writes++;
+    }
+
+    mergeSort(left, stats);
+    mergeSort(right, stats);
+
+    int i = 0;
+    int j = 0;
+    int k = 0;
+
+    while (i < static_cast<int>(left.size()) &&
+           j < static_cast<int>(right.size())) {
+        stats.comparisons++;
+
+        if (left[i] <= right[j]) {
+            a[k] = left[i];
+            i++;
+        } else {
+            a[k] = right[j];
+            j++;
+        }
+
+        stats.writes++;
+        k++;
+    }
+
+    while (i < static_cast<int>(left.size())) {
+        a[k] = left[i];
+        stats.writes++;
+        i++;
+        k++;
+    }
+
+    while (j < static_cast<int>(right.size())) {
+        a[k] = right[j];
+        stats.writes++;
+        j++;
+        k++;
+    }
 }
 
 void printStatistics(const char* name, const Statistics& stats) {
@@ -107,7 +128,7 @@ void printStatistics(const char* name, const Statistics& stats) {
     cout << "  Сравнений элементов: " << stats.comparisons << '\n';
     cout << "  Записей в массив: " << stats.writes << '\n';
     cout << "  Всего операций: "
-        << stats.comparisons + stats.writes << "\n\n";
+         << stats.comparisons + stats.writes << "\n\n";
 }
 
 int main() {
@@ -125,22 +146,22 @@ int main() {
 
     vector<int> bubbleArray = original;
     vector<int> insertionArray = original;
-    vector<int> quickArray = original;
+    vector<int> mergeArray = original;
 
     Statistics bubbleStats;
     Statistics insertionStats;
-    Statistics quickStats;
+    Statistics mergeStats;
 
     bubbleSort(bubbleArray, bubbleStats);
     insertionSort(insertionArray, insertionStats);
-    quickSort(quickArray, 0, N - 1, quickStats);
+    mergeSort(mergeArray, mergeStats);
 
     cout << "Размер массива: " << N << " элементов\n";
     cout << "Диапазон чисел: от -100 до 100\n\n";
 
     printStatistics("Пузырьковая сортировка", bubbleStats);
-    printStatistics("Сортировка вставками", insertionStats);
-    printStatistics("Быстрая сортировка Хоара", quickStats);
+    printStatistics("Сортировка вставками с бинарным поиском", insertionStats);
+    printStatistics("Сортировка слиянием", mergeStats);
 
     return 0;
 }
