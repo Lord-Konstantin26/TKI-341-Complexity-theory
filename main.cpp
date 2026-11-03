@@ -71,55 +71,47 @@ void mergeSort(vector<int>& a, Statistics& stats) {
         return;
     }
 
-    int middle = static_cast<int>(a.size()) / 2;
+    int pivotIndex = static_cast<int>(a.size()) / 2;
+    int pivot = a[pivotIndex];
+
     vector<int> left;
     vector<int> right;
 
-    for (int i = 0; i < middle; i++) {
-        left.push_back(a[i]);
-        stats.writes++;
-    }
+    for (int i = 0; i < static_cast<int>(a.size()); i++) {
+        if (i == pivotIndex) {
+            continue;
+        }
 
-    for (int i = middle; i < static_cast<int>(a.size()); i++) {
-        right.push_back(a[i]);
-        stats.writes++;
+        stats.comparisons++;
+
+        if (a[i] <= pivot) {
+            left.push_back(a[i]);
+            stats.writes++;
+        } else {
+            right.push_back(a[i]);
+            stats.writes++;
+        }
     }
 
     mergeSort(left, stats);
     mergeSort(right, stats);
 
-    int i = 0;
-    int j = 0;
-    int k = 0;
+    int index = 0;
 
-    while (i < static_cast<int>(left.size()) &&
-           j < static_cast<int>(right.size())) {
-        stats.comparisons++;
-
-        if (left[i] <= right[j]) {
-            a[k] = left[i];
-            i++;
-        } else {
-            a[k] = right[j];
-            j++;
-        }
-
+    for (int value : left) {
+        a[index] = value;
         stats.writes++;
-        k++;
+        index++;
     }
 
-    while (i < static_cast<int>(left.size())) {
-        a[k] = left[i];
-        stats.writes++;
-        i++;
-        k++;
-    }
+    a[index] = pivot;
+    stats.writes++;
+    index++;
 
-    while (j < static_cast<int>(right.size())) {
-        a[k] = right[j];
+    for (int value : right) {
+        a[index] = value;
         stats.writes++;
-        j++;
-        k++;
+        index++;
     }
 }
 
@@ -161,7 +153,7 @@ int main() {
 
     printStatistics("Пузырьковая сортировка", bubbleStats);
     printStatistics("Сортировка вставками с бинарным поиском", insertionStats);
-    printStatistics("Сортировка слиянием", mergeStats);
+    printStatistics("Третья сортировка", mergeStats);
 
     return 0;
 }
